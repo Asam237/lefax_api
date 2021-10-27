@@ -4,10 +4,11 @@ const Users = require("../../models/user")
 const bcryptjs = require("bcryptjs")
 
 router.post("/register", (req, res) => {
-    Users.findOne({ email: req.body.email }).then(user => {
-        if (user) {
+    async function userRegistration() {
+        let response = await Users.findOne({ email: req.body.email });
+        if (response) {
             return res.status(400).json({
-                email: 'Email al reasy exist !'
+                email: 'Email al ready exist !'
             })
         } else {
             const newUser = new Users({
@@ -15,7 +16,6 @@ router.post("/register", (req, res) => {
                 email: req.body.email,
                 password: req.body.password
             })
-
             bcryptjs.genSalt(10, (err, salt) => {
                 bcryptjs.hash(newUser.password, salt, (err, hash) => {
                     if (err) throw err;
@@ -25,30 +25,35 @@ router.post("/register", (req, res) => {
                         .catch(err => console.log(err))
                 })
             })
+
         }
-    })
+    }
+    userRegistration()
 })
 
 router.post("/login", (req, res) => {
     const email = req.body.email;
     const password = req.body.password;
-    Users.findOne({ email })
-        .then(user => {
-            if (!user) {
-                return res.status(404).json({
-                    email: 'User not found !'
-                })
-            }
-            bcryptjs.compare(password, user.password).then(isMatch => {
-                if (isMatch) {
-                    res.json({ message: "Success !" })
-                } else {
-                    return res.status(400).json({
-                        password: "Password incorrect"
-                    })
-                }
+
+    async function userLogin() {
+        let response = await Users.findOne({ email })
+        if (!response) {
+            return res.status(400).json({
+                email: "User not found !"
             })
-        })
+        }
+        let isMatch = await bcryptjs.compare(password, response.password)
+        if (isMatch) {
+            res.json({ message: "Success !" })
+        } else {
+            return res.status(400).json({
+                password: "Password incorrect"
+            })
+        }
+    }
+
+    userLogin()
 })
+
 
 module.exports = router
