@@ -5,16 +5,18 @@ const mongoose = require("mongoose")
 const users = require("./routes/api/users")
 const bodyParser = require("body-parser")
 
-mongoose.connect('mongodb+srv://lefax:Abbasali97@lefaxapi.dupam.mongodb.net/myFirstDatabase?retryWrites=true&w=majority')
-    .then(() => {
-        console.log('Database Connected');
-    })
-    .catch(err => {
-        console.log('Database not Connected ' + err)
-    });
+async function mongoDbConnection() {
+    try {
+        await mongoose.connect('mongodb+srv://lefax:Abbasali97@lefaxapi.dupam.mongodb.net/myFirstDatabase?retryWrites=true&w=majority');
+        return console.log('[MongoDB] Connected');
+    }
+    catch (e) {
+        console.log('[MongoDB] not Connected ' + e)
+    }
+}
 
+mongoDbConnection()
 
-app.get("/", (req, res) => res.send("Hellp world"))
 app.use(bodyParser.json())
 app.use("/api/users", users)
 
