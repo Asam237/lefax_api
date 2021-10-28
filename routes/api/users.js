@@ -3,8 +3,8 @@ const router = express.Router()
 const Users = require("../../models/user")
 const bcryptjs = require("bcryptjs")
 
-router.post("/register", async (req, res) => {
-    try {
+router.post("/register", (req, res) => {
+    async function userRegistration() {
         let response = await Users.findOne({ email: req.body.email });
         if (response) {
             return res.status(400).json({
@@ -20,27 +20,22 @@ router.post("/register", async (req, res) => {
                 bcryptjs.hash(newUser.password, salt, (err, hash) => {
                     if (err) throw err;
                     newUser.password = hash;
-                    async () => {
-                        try {
-                            await newUser.save();
-                        } catch (e) {
-                            console.error("Error " + e)
-                        }
-                    }
+                    newUser.save()
+                        .then(user => res.json(user))
+                        .catch(err => console.log(err))
                 })
             })
-        }
-    } catch (e) {
-        console.error(e)
-    }
 
+        }
+    }
+    userRegistration()
 })
 
 router.post("/login", (req, res) => {
     const email = req.body.email;
     const password = req.body.password;
 
-    async () => {
+    async function userLogin() {
         let response = await Users.findOne({ email })
         if (!response) {
             return res.status(400).json({
@@ -57,6 +52,7 @@ router.post("/login", (req, res) => {
         }
     }
 
+    userLogin()
 })
 
 
