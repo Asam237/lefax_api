@@ -1,13 +1,16 @@
 const express = require("express")
 const app = express()
-const port = process.env.PORT || 5000
+const port = process.env.PORT || 8080
 const mongoose = require("mongoose")
 const users = require("./routes/api/users")
 const bodyParser = require("body-parser")
 const passport = require("passport")
 const FacebookStrategy = require('passport-facebook').Strategy;
+const path = require("path")
 const fb = require("./fb")
 
+
+app.use('/', express.static(path.join(__dirname, '/template')))
 
 app.set('view engine', 'ejs')
 
@@ -34,9 +37,9 @@ passport.use(new FacebookStrategy({
     return (null, profile)
 }))
 
-app.get("/", (req, res) => {
-    res.render("./views/pages/index.ejs")
-})
+// app.get("/", (req, res) => {
+//     res.render("./views/pages/index.ejs")
+// })
 
 
 app.listen(port, () => console.log(`Server is running on ${port}`))
