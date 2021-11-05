@@ -4,6 +4,12 @@ const port = process.env.PORT || 5000
 const mongoose = require("mongoose")
 const users = require("./routes/api/users")
 const bodyParser = require("body-parser")
+const passport = require("passport")
+const FacebookStrategy = require('passport-facebook').Strategy;
+const fb = require("./fb")
+
+
+app.set('view engine', 'ejs')
 
 async function mongoDbConnection() {
     try {
@@ -19,5 +25,18 @@ mongoDbConnection()
 
 app.use(bodyParser.json())
 app.use("/api/users", users)
+
+passport.use(new FacebookStrategy({
+    clientID: fb.appID,
+    clientSecret: fb.appSecret,
+    callbackURL: fb.callBackUrl
+}, function (accessToken, refreshToken, profile, done) {
+    return (null, profile)
+}))
+
+app.get("/", (req, res) => {
+    res.render("./views/pages/index.ejs")
+})
+
 
 app.listen(port, () => console.log(`Server is running on ${port}`))

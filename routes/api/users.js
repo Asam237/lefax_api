@@ -2,6 +2,9 @@ const express = require("express")
 const router = express.Router()
 const Users = require("../../models/user")
 const bcryptjs = require("bcryptjs")
+const passport = require("passport")
+
+
 
 router.post("/register", (req, res) => {
     async function userRegistration() {
@@ -55,5 +58,37 @@ router.post("/login", (req, res) => {
     userLogin()
 })
 
+
+// FacebookAuth
+
+router.get('/', (req, res) => {
+    res.render('pages/index')
+});
+
+router.get('/profile', isLoggedIn, (req, res) => {
+    res.render('pages/profile.ejs', {
+        user: req.user
+    });
+});
+
+router.get('/error', isLoggedIn, (req, res) => {
+    res.send("Error !")
+});
+
+router.get('/auth/facebook', passport.authenticate('facebook', {
+    scope: ['public_profile', 'email']
+}));
+
+router.get('/auth/facebook/callback',
+    passport.authenticate('facebook', {
+        successRedirect: '/profile',
+        failureRedirect: '/error'
+    }));
+
+function isLoggedIn(req, res, next) {
+    if (req.isAuthenticated())
+        return next();
+    res.redirect('/');
+}
 
 module.exports = router
