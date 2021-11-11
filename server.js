@@ -8,6 +8,7 @@ const passport = require("passport")
 const FacebookStrategy = require('passport-facebook').Strategy;
 const path = require("path")
 const fb = require("./fb")
+const authRoutes = require("./routes/auth")
 
 
 app.use('/', express.static(path.join(__dirname, '/template')))
@@ -25,9 +26,9 @@ async function mongoDbConnection() {
 }
 
 mongoDbConnection()
-
 app.use(bodyParser.json())
 app.use("/api/users", users)
+app.use(authRoutes)
 
 passport.use(new FacebookStrategy({
     clientID: fb.appID,
