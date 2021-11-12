@@ -4,11 +4,12 @@ const port = process.env.PORT || 8080
 const mongoose = require("mongoose")
 const bodyParser = require("body-parser")
 const passport = require("passport")
-const FacebookStrategy = require('passport-facebook').Strategy;
 const path = require("path")
 const fb = require("./fb")
 const authRoutes = require("./routes/auth")
 const shopRoutes = require("./routes/shop")
+const adminRoutes = require("./routes/admin")
+// const FacebookStrategy = require('passport-facebook').Strategy;
 
 
 async function mongoDbConnection() {
@@ -25,14 +26,15 @@ mongoDbConnection()
 app.use(bodyParser.json())
 app.use(authRoutes)
 app.use(shopRoutes)
+app.use(adminRoutes)
 
-passport.use(new FacebookStrategy({
-    clientID: fb.appID,
-    clientSecret: fb.appSecret,
-    callbackURL: fb.callBackUrl
-}, function (accessToken, refreshToken, profile, done) {
-    return (null, profile)
-}))
+// passport.use(new FacebookStrategy({
+//     clientID: fb.appID,
+//     clientSecret: fb.appSecret,
+//     callbackURL: fb.callBackUrl
+// }, function (accessToken, refreshToken, profile, done) {
+//     return (null, profile)
+// }))
 
 
 app.listen(port, () => console.log(`Server is running on ${port}`))
