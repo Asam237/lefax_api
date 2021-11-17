@@ -1,5 +1,7 @@
 const bcryptjs = require("bcryptjs")
 const User = require("../models/User")
+const jwt = require("jsonwebtoken");
+const { secretOrKey } = require("../config/keys");
 
 exports.postLogin = (req, res, next) => {
     const email = req.body.email;
@@ -15,7 +17,19 @@ exports.postLogin = (req, res, next) => {
                 .compare(password, user.password)
                 .then(isMatch => {
                     if (isMatch) {
-                        return res.json({ message: "Success !" })
+                        const payload = {
+                            id: user.id,
+                            email: user.email,
+                            tel: user.tel,
+                            firstName: user.firstName,
+                            lastName: user.lastName
+                        }
+                        jwt.sign(payload, secretOrKey, { expiresIn: 3600 }, (err, token) => {
+                            res.json({
+                                success: true,
+                                token: 'Bearer ' + token
+                            })
+                        })
                     } else {
                         return res.status(400).json({
                             password: "Password incorrect"
